@@ -1,5 +1,8 @@
 # code-teamplate
 
+Cài đặt composer create-project --prefer-dist laravel/laravel test_laravel
+Cài đặt Laravel debugbar: https://github.com/barryvdh/laravel-debugbar
+
 Template cơ bản cho laravel
 Bắt đầu:
 
@@ -72,7 +75,7 @@ class DashboardController extends Controller{
     }
 
     public function index(){
-        return view($this->pathViewController . 'index');
+        return view($this->pathViewController . 'index', ['name' => 'lê hồng quang']); // Đưa dữ liệu ra view
     }
 }
 ```
@@ -108,3 +111,53 @@ class DashboardController extends Controller{
 
 -   Đối với menu: Để gắn link cho menu ta sử dụng {{ route('dashboard') }}:
     dashboard là route trong web.php
+
+===== KHỞI TẠO MODEL =====
+
+-   Kết nối database, mở file .env và khai báo thông tin kết nối.
+-   Trong folder app/ tạo folder Models.
+-   Tạo file model trong app/Models với cấu trúc tên class phải cùng với tên file. Ví dụ: file UsersModel.php thì class là UsersModel, class vừa tạo phải kế thừa Model gốc của laravel
+-   Tạo model bằng artisan `php artisan make:model UsersModel`
+
+-   Model cần có các thông tin và cấu hình như sau:
+
+```
+namespace App\Models;
+use Illuminate\Database\Eloquent\Model;
+
+class UsersModel extends Model{
+    // Mặc định tên bảng sẽ là UsersModels, ở đây định nghĩa lại tên bảng để sử dụng bảng khác mặc định
+    protected $table = 'users';
+
+    // Cấu hình lại tên column thời gian lưu và thời gian cập nhật
+    // tên mặc định inserted_at.
+    const CREATED_AT = 'created';
+    // Tên mặc định updated_at.
+    const UPDATED_AT = 'modified';
+
+    // $timestamps mặc định sẽ là true và sẽ tự động cập nhật thời gian nếu trong bảng có 2 trường thời gian tạo và thời gian cập nhật, nếu false thì không.
+    public $timestamps = true;
+
+    // Ví dụ tạo phương thức lấy danh sách users
+    public function listItems()
+    {
+        $result = null;
+        $result = UsersModel::all();
+
+        return $result;
+    }
+}
+```
+
+-   Ở controller UsersController.php để sử dụng model vừa tạo cần khai báo use và gán thành tên MailModel `use App\Models\UsersModel as MainModel;`
+-   Ở ví dụ này lấy danh sách users thì sử dụng phương thức all() như sau:
+
+```
+// Khởi tạo giá trị tên model đã khai báo ở trên.
+$MainModel = new MainModel();
+$items = $MainModel->listItems();
+
+foreach ($items as $item) {
+    echo $item->name;
+}
+```

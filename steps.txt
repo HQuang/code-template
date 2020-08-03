@@ -1,7 +1,12 @@
+# code-teamplate
+
+Template cơ bản cho laravel
 Bắt đầu:
 
 ===== KHỞI TẠO FILE CẤU HÌNH CHUNG ======
-config/configOptimal.php
+
+-   Tại folder config tạo file configOptimal.php với nội dung bên dưới.
+    config/configOptimal.php
 
 ```
 return [
@@ -13,9 +18,10 @@ return [
 ];
 ```
 
-
 ===== KHỞI TẠO ROUTE =====
-routes/web.php
+
+-   Tại file web.php trong folder routes sử dụng để khai báo và sử dụng các route, khai báo với nội dung code như bên dưới.
+    routes/web.php
 
 ```
 use Illuminate\Support\Facades\Route;
@@ -48,10 +54,10 @@ Route::group(['prefix' => $prefixAdmin], function () {
 });
 ```
 
-
 ===== KHỞI TẠO CONTROLLER =====
-Khởi tạo tên controller theo tên $ControllerName đã cấu hình trong route
-app/Http/Controllers/DashboardController.php
+
+-   Khởi tạo tên controller theo tên \$ControllerName đã cấu hình trong route.
+    app/Http/Controllers/DashboardController.php
 
 ```
 namespace App\Http\Controllers;
@@ -72,3 +78,70 @@ class DashboardController extends Controller{
 ```
 
 ===== KHỞI TẠO VIEW =====
+
+-   Trong folder resources/views/ khởi tạo folder con và file theo khai báo ở \$this->pathViewController . 'index'
+    resources/views/admin/dashboard/index.blade.php
+
+===== GHÉP GIAO DIỆN BLADE =====
+
+-   Giao diện HTML, css, js ... sẽ nằm trong folder public
+
+-   Theo ví dụ này tạo folder admin để xây dựng cấu trúc và chứa các thành phần giao diện trang admin, copy giao diện vào folder admin này.
+
+-   Tại folder resources/views/admin tạo file main.blade.php để chứa bố cục giao diện sử dụng chung, copy code giao diện vào file này.
+
+-   Thêm link css, js: Trong blade template có phương asset() : dùng để liên kết đến file css, js, images.
+    Ví dụ <link href="{{ asset('admin/asset/bootstrap/dist/css/bootstrap.min.css') }}" rel="stylesheet">
+
+*   Tại resources/views/admin/dashboard/index.blade.php sử dụng @extends('admin.main') để kế thừa giao diện từ file resources/views/admin/main.blade.php.
+
+*   Tạo các layout bố cục cho giao diện:
+    Tạo folder layout trong resources/views/admin/
+    Tạo các file layout như header.blade.php, footer.blade.php ... tùy vào yêu cầu bố cục của giao diện.
+
+-   Tại resources/views/admin/main.blade.php sau khi đã xác định vị trí nội dung thì đặt thẻ @yield('content') để kế thừa nội dung của các module.
+
+-   Ở file resources/views/admin/dashboard/index.blade.php sử dụng cặp thẻ @section và @endsection để mở và khởi tạo nội dung cần hiển thị cho module
+    @section('content')
+    `content`
+    @endsection
+
+-   Đối với menu: Để gắn link cho menu ta sử dụng {{ route('dashboard') }}:
+    dashboard là route trong web.php
+
+===== KHỞI TẠO MODEL =====
+
+-   Kết nối database, mở file .env và khai báo thông tin kết nối.
+-   Trong folder app/ tạo folder Model.
+-   Tạo file model trong app/Model với cấu trúc tên class phải cùng với tên file. Ví dụ: file UsersModel.php thì class là UsersModel, class vừa tạo phải kế thừa Model gốc của laravel
+-   Tạo model bằng artisan `php artisan make:model UsersModel`
+
+-   Model cần có các thông tin và cấu hình như sau:
+
+```
+namespace App;
+use Illuminate\Database\Eloquent\Model;
+class UsersModel extends Model{
+    // Mặc định tên bảng sẽ là UsersModels, ở đây định nghĩa lại tên bảng để sử dụng bảng khác mặc định
+    protected $table = 'users';
+
+    // Cấu hình lại tên column thời gian lưu và thời gian cập nhật
+    // tên mặc định inserted_at.
+    const CREATED_AT = 'created';
+    // Tên mặc định updated_at.
+    const UPDATED_AT = 'modified';
+
+    // $timestamps mặc định sẽ là true và sẽ tự động cập nhật thời gian nếu trong bảng có 2 trường thời gian tạo và thời gian cập nhật, nếu false thì không.
+    public $timestamps = true;
+}
+```
+
+-   Ở controller UsersController.php để sử dụng model vừa tạo cần khai báo use App\UsersModel as UsersModel;
+-   Ở ví dụ này lấy danh sách users thì sử dụng phương thức all() như sau:
+
+```
+$items = UsersModel::all();
+foreach ($items as $item) {
+    echo $item->username;
+}
+```
